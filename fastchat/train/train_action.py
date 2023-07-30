@@ -117,8 +117,7 @@ def preprocess(
 
         total_len = int(target.ne(tokenizer.pad_token_id).sum())
         inputs, outputs = conversation.split(sep)  # [.., goal, history | next_action]
-        cur_len = 1
-        target[:cur_len] = IGNORE_TOKEN_ID
+        cur_len = 0
         instruction_len = len(tokenizer(inputs + sep).input_ids) - 2
         target[cur_len:cur_len+instruction_len] = IGNORE_TOKEN_ID
         cur_len += instruction_len
@@ -247,7 +246,6 @@ def train():
         use_fast=False,
     )
     tokenizer.pad_token = tokenizer.unk_token
-    tokenizer.model_max_length = 4096
 
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
     trainer = Trainer(
