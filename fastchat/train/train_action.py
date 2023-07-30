@@ -118,9 +118,9 @@ def preprocess(
         total_len = int(target.ne(tokenizer.pad_token_id).sum())
         inputs, outputs = conversation.split(sep)  # [.., goal, history | next_action]
         cur_len = 0
-        instruction_len = len(tokenizer(inputs + sep).input_ids) - 2
+        instruction_len = len(tokenizer(inputs + sep).input_ids) - 1
         target[cur_len:cur_len+instruction_len] = IGNORE_TOKEN_ID
-        cur_len += instruction_len
+        cur_len += instruction_len - 1
         outputs_len = len(tokenizer(outputs).input_ids)
         target[cur_len+outputs_len:] = IGNORE_TOKEN_ID
         cur_len += outputs_len
@@ -244,6 +244,7 @@ def train():
         model_max_length=training_args.model_max_length,
         padding_side="right",
         use_fast=False,
+        legacy=False,
     )
     tokenizer.pad_token = tokenizer.unk_token
 
