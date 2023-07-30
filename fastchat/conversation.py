@@ -380,6 +380,19 @@ register_conv_template(
     )
 )
 
+# Action LLM default template
+register_conv_template(
+    Conversation(
+        name="action",
+        system="Below is a goal you need to achieve. Given the history of past actions provide the next action to perform.",
+        roles=("### Goal", "### History", "### Next action"),
+        messages=(),
+        offset=0,
+        sep_style=SeparatorStyle.ADD_COLON_SINGLE,
+        sep="\n\n",  # separator between roles
+    )
+)
+
 # ChatGLM default template
 register_conv_template(
     Conversation(
