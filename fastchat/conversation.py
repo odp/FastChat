@@ -384,8 +384,8 @@ register_conv_template(
 register_conv_template(
     Conversation(
         name="action",
-        system="Below is a goal you need to achieve. Given the history of past actions provide the next action to perform.",
-        roles=("### Goal", "### History", "### Next action"),
+        system="Below is a goal you need to achieve. Given the available tools and history of past actions provide the next action to perform.",
+        roles=("### Goal", "### Tools", "### History", "### Next action"),
         messages=(),
         offset=0,
         sep_style=SeparatorStyle.ADD_COLON_SINGLE,

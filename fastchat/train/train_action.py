@@ -80,7 +80,10 @@ def preprocess(
     tokenizer: transformers.PreTrainedTokenizer,
 ) -> Dict:
     conv = get_conversation_template("action")
-    roles = {"goal": conv.roles[0], "history": conv.roles[1], "next_action": conv.roles[2]}
+    roles = {"goal": conv.roles[0],
+             "tools": conv.roles[1],
+             "history": conv.roles[2],
+             "next_action": conv.roles[3]}
 
     # Apply prompt templates
     conversations = []
