@@ -429,38 +429,33 @@ async def chat_completion_stream_generator(
 
 @app.post("/v1/completions")
 async def create_completion(request: CompletionRequest):
-    error_check_ret = await check_model(request)
-    if error_check_ret is not None:
+    if (error_check_ret := await check_model(request)):
         return error_check_ret
-    error_check_ret = check_requests(request)
-    if error_check_ret is not None:
+    if (error_check_ret := check_requests(request)):
         return error_check_ret
 
-    for text in request.prompt:
-        error_check_ret = await check_length(request, text, request.max_tokens)
-        if error_check_ret is not None:
-            return error_check_ret
+    if (error_check_ret := await check_length(request, request.prompt, request.max_tokens)):
+        return error_check_ret
 
     if request.stream:
         generator = generate_completion_stream_generator(request, request.n)
         return StreamingResponse(generator, media_type="text/event-stream")
     else:
         text_completions = []
-        for text in request.prompt:
-            gen_params = await get_gen_params(
-                request.model,
-                text,
-                temperature=request.temperature,
-                top_p=request.top_p,
-                max_tokens=request.max_tokens,
-                echo=request.echo,
-                stream=request.stream,
-                stop=request.stop,
-            )
-            logger.info(f"{gen_params}")
-            for i in range(request.n):
-                content = asyncio.create_task(generate_completion(gen_params))
-                text_completions.append(content)
+        gen_params = await get_gen_params(
+            request.model,
+            request.prompt,
+            temperature=request.temperature,
+            top_p=request.top_p,
+            max_tokens=request.max_tokens,
+            echo=request.echo,
+            stream=request.stream,
+            stop=request.stop,
+        )
+        logger.info(f"{gen_params}")
+        for i in range(request.n):
+            content = asyncio.create_task(generate_completion(gen_params))
+            text_completions.append(content)
 
         try:
             all_tasks = await asyncio.wait_for(asyncio.gather(*text_completions), timeout=500)
